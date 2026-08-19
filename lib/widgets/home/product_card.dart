@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project/models/product.dart';
 import 'package:project/constants.dart';
+import 'package:project/widgets/common/smart_image.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -48,7 +49,7 @@ class ProductCard extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: kDefaultPadding),
                 height: 160.0,
                 width: 200.0,
-                child: Image.asset(product.image, fit: BoxFit.cover),
+                child: SmartImage(path: product.image, fit: BoxFit.cover),
               ),
             ),
             Positioned(
@@ -87,7 +88,7 @@ class ProductCard extends StatelessWidget {
                           color: kSecondaryColor,
                           borderRadius: BorderRadius.circular(22),
                         ),
-                        child: Text('prix :\$${product.price}'),
+                        child: Text('prix : \$${product.price.toStringAsFixed(2)}'),
                       ),
                     ),
                   ],

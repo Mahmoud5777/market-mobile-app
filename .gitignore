@@ -43,3 +43,37 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# --- Backend (Spring Boot / Maven) ---
+backend/target/
+backend/build/
+*.jar
+*.war
+!gradle-wrapper.jar
+
+# --- Secrets / config sensible (JAMAIS sur GitHub) ---
+.env
+.env.*
+!.env.example
+**/application-local.yml
+**/application-secrets.yml
+**/application-local.properties
+*.pem
+*.key
+
+# --- Dashboard React (si ajouté dans ce repo) ---
+dashboard/node_modules/
+dashboard/build/
+dashboard/.env
+
+# --- Pipeline PySpark / Python (si ajouté dans ce repo) ---
+pipeline/__pycache__/
+pipeline/.venv/
+pipeline/*.pyc
+pipeline/spark-warehouse/
+pipeline/metastore_db/
+
+# --- Docker ---
+docker-compose.override.yml
+*.env.local
+

@@ -1,76 +1,91 @@
 import 'package:flutter/material.dart';
-import 'package:project/models/product.dart';
+import 'package:provider/provider.dart';
+import 'package:project/constants.dart';
+import 'package:project/providers/cart_provider.dart';
 import 'package:project/widgets/payement/CardPaymentFormPage.dart';
 
 class PaymentPage extends StatefulWidget {
-  final Product produit;
-  final int quantity;
-
-  const PaymentPage({super.key, required this.produit, required this.quantity});
+  const PaymentPage({super.key});
 
   @override
   State<PaymentPage> createState() => _PaymentPageState();
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  String? selectedMethod;
+  String selectedMethod = 'card';
 
   @override
   Widget build(BuildContext context) {
-   int totalPrice = widget.produit.price * widget.quantity;
+    final cart = context.watch<CartProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Paiement")),
+      backgroundColor: kBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: kPrimaryColor,
+        title: const Text('Paiement'),
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(kDefaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Résumé de la commande",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Text("Produit : ${widget.produit.title}"),
-            Text("Quantité : ${widget.quantity}"),
-            Text("Total : ${totalPrice.toStringAsFixed(2)} €"),
-            const SizedBox(height: 40),
-            const Text("Méthode de paiement", style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              value: selectedMethod,
-              items: const [
-                DropdownMenuItem(value: "card", child: Text("Carte bancaire")),
-                DropdownMenuItem(value: "mastercard", child: Text("Master Card")),
-              ],
-              onChanged: (value) {
-                setState(() {
-                  selectedMethod = value;
-                });
-              },
-              hint: const Text("Choisir une méthode"),
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 10),
+            const Text('Récapitulatif', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Total à payer'),
+                    Text(
+                      '\$${cart.total.toStringAsFixed(2)}',
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: kSecondaryColor),
+                    ),
+                  ],
+                ),
               ),
             ),
+            const SizedBox(height: 24),
+            const Text('Choisis un moyen de paiement (simulé)',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 12),
+            RadioListTile<String>(
+              value: 'card',
+              groupValue: selectedMethod,
+              title: const Text('Carte bancaire'),
+              secondary: const Icon(Icons.credit_card),
+              onChanged: (value) => setState(() => selectedMethod = value!),
+            ),
+            RadioListTile<String>(
+              value: 'mastercard',
+              groupValue: selectedMethod,
+              title: const Text('Mastercard'),
+              secondary: const Icon(Icons.credit_card),
+              onChanged: (value) => setState(() => selectedMethod = value!),
+            ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (selectedMethod == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Veuillez choisir une méthode de paiement")),
-                    );
-                    return;
-                  }
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => CardPayment()),
-                  );
-                },
-                child: const Text("Payer maintenant"),
+            SafeArea(
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: cart.items.isEmpty
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => CardPaymentFormPage(paymentMethod: selectedMethod),
+                            ),
+                          );
+                        },
+                  child: const Text('Continuer', style: TextStyle(fontSize: 18)),
+                ),
               ),
             ),
           ],

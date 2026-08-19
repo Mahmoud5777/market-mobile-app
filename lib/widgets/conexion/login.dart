@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project/screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:project/providers/auth_provider.dart';
+import 'package:project/services/api_client.dart';
 import 'package:project/widgets/conexion/creation.dart';
 
 class LoginPage extends StatefulWidget {
@@ -11,27 +13,45 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String errorText = '';
+  bool isLoading = false;
 
-  void login() {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-    if (email == "admin@example.com" && password == "123456") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => Homescreen()),
-      );
-    } else {
-      setState(() {
-        errorText = "Email ou mot de passe incorrect ❌";
-      });
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => errorText = "Veuillez remplir tous les champs");
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      errorText = '';
+    });
+
+    try {
+      await context.read<AuthProvider>().login(email: email, password: password);
+      if (!mounted) return;
+      Navigator.pop(context, true);
+    } on ApiException catch (e) {
+      setState(() => errorText = e.message);
+    } catch (e) {
+      setState(() => errorText = "Impossible de contacter le serveur");
+    } finally {
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200], 
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black87,
+      ),
+      extendBodyBehindAppBar: true,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
@@ -62,6 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(height: 30),
                 TextField(
                   controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: "Email",
                     border: OutlineInputBorder(
@@ -92,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: login,
+                    onPressed: isLoading ? null : login,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
@@ -100,16 +121,25 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       backgroundColor: Colors.blueAccent,
                     ),
-                    child: Text("Se connecter", style: TextStyle(fontSize: 16)),
+                    child: isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text("Se connecter", style: TextStyle(fontSize: 16)),
                   ),
                 ),
                 SizedBox(height: 15),
                 TextButton(
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    final registered = await Navigator.push<bool>(
                       context,
                       MaterialPageRoute(builder: (_) => RegisterPage()),
                     );
+                    if (registered == true && mounted) {
+                      Navigator.pop(context, true);
+                    }
                   },
                   child: Text(
                     "Pas encore de compte ? Créer un compte",

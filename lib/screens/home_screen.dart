@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:project/constants.dart';
+import 'package:project/providers/auth_provider.dart';
+import 'package:project/providers/cart_provider.dart';
+import 'package:project/screens/admin/admin_products_screen.dart';
+import 'package:project/screens/cart_screen.dart';
+import 'package:project/widgets/common/auth_guard.dart';
 import 'package:project/widgets/home/home_body.dart';
 import 'package:project/widgets/menu/barre_menu.dart';
 
@@ -7,6 +13,9 @@ class Homescreen extends StatelessWidget {
   const Homescreen({super.key});
 
   AppBar homeAppBar(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final cart = context.watch<CartProvider>();
+
     return AppBar(
       backgroundColor: kPrimaryColor,
       elevation: 0,
@@ -42,6 +51,35 @@ class Homescreen extends StatelessWidget {
         },
         icon: const Icon(Icons.menu),
       ),
+      actions: [
+        if (auth.isAdmin)
+          IconButton(
+            tooltip: 'Gérer les produits',
+            icon: const Icon(Icons.admin_panel_settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminProductsScreen()),
+              );
+            },
+          ),
+        IconButton(
+          tooltip: 'Panier',
+          icon: Badge(
+            label: Text('${cart.itemCount}'),
+            isLabelVisible: cart.itemCount > 0,
+            child: const Icon(Icons.shopping_cart),
+          ),
+          onPressed: () async {
+            final loggedIn = await ensureLoggedIn(context);
+            if (!loggedIn || !context.mounted) return;
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CartScreen()),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -50,7 +88,7 @@ class Homescreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kPrimaryColor,
       appBar: homeAppBar(context),
-      body: HomeBody(),
+      body: const HomeBody(),
     );
   }
 }

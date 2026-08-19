@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project/constants.dart';
+import 'package:project/widgets/common/smart_image.dart';
 
 class ProductImage extends StatelessWidget {
   const ProductImage({super.key, required this.size, required this.image});
@@ -23,8 +24,8 @@ class ProductImage extends StatelessWidget {
               shape: BoxShape.circle,
             ),
           ),
-          Image.asset(
-            image,
+          SmartImage(
+            path: image,
             height: size.width * 0.75,
             width: size.width * 0.75,
             fit: BoxFit.cover,
