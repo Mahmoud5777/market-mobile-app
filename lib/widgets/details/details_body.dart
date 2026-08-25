@@ -30,7 +30,9 @@ class _DetailsBodyState extends State<DetailsBody> {
     // besoin d'attendre ce fetch pour afficher quoi que ce soit. On l'appelle
     // uniquement pour que le backend enregistre la consultation (événement Kafka
     // product-views) - erreurs ignorées volontairement, ce n'est pas critique.
-    ProductService.fetchById(widget.product.id).catchError((_) => widget.product);
+    ProductService.fetchById(
+      widget.product.id,
+    ).catchError((_) => widget.product);
   }
 
   Future<void> _addToCart() async {
@@ -45,29 +47,34 @@ class _DetailsBodyState extends State<DetailsBody> {
     setState(() => isAdding = true);
     try {
       await context.read<CartProvider>().addToCart(
-            productId: widget.product.id,
-            quantity: quantity,
-            token: token,
-          );
+        productId: widget.product.id,
+        quantity: quantity,
+        token: token,
+      );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Ajouté au panier ✅"),
+          content: const Text("Added to cart ✅"),
           action: SnackBarAction(
-            label: "Voir le panier",
+            label: "View cart",
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartScreen()),
+              );
             },
           ),
         ),
       );
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Impossible d'ajouter au panier")),
+        const SnackBar(content: Text("Unable to add item to cart")),
       );
     } finally {
       if (mounted) setState(() => isAdding = false);
@@ -95,9 +102,13 @@ class _DetailsBodyState extends State<DetailsBody> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Center(child: ProductImage(size: size, image: widget.product.image)),
+                Center(
+                  child: ProductImage(size: size, image: widget.product.image),
+                ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: kDefaultPadding,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -108,7 +119,9 @@ class _DetailsBodyState extends State<DetailsBody> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(vertical: kDefaultPadding),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: kDefaultPadding,
+                  ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -118,7 +131,8 @@ class _DetailsBodyState extends State<DetailsBody> {
                           IconButton(
                             icon: const Icon(Icons.add_circle_outline),
                             onPressed: () {
-                              if (quantity < widget.product.stock || widget.product.stock == 0) {
+                              if (quantity < widget.product.stock ||
+                                  widget.product.stock == 0) {
                                 setState(() {
                                   quantity++;
                                 });
@@ -127,7 +141,10 @@ class _DetailsBodyState extends State<DetailsBody> {
                           ),
                           Text(
                             '$quantity',
-                            style: const TextStyle(fontSize: 20, color: Colors.black),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: Colors.black,
+                            ),
                           ),
                           IconButton(
                             icon: const Icon(Icons.remove_circle_outline),
@@ -153,7 +170,7 @@ class _DetailsBodyState extends State<DetailsBody> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'prix : \$${widget.product.price.toStringAsFixed(2)}',
+                              'Price: \$${widget.product.price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 24.0,
                                 fontWeight: FontWeight.w600,
@@ -162,7 +179,7 @@ class _DetailsBodyState extends State<DetailsBody> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Total : \$${totalPrice.toStringAsFixed(2)}',
+                              'Total: \$${totalPrice.toStringAsFixed(2)}',
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w500,
@@ -172,12 +189,18 @@ class _DetailsBodyState extends State<DetailsBody> {
                             if (widget.product.stock > 0)
                               Text(
                                 '${widget.product.stock} en stock',
-                                style: const TextStyle(fontSize: 13, color: kTextLightColor),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: kTextLightColor,
+                                ),
                               )
                             else
                               const Text(
                                 'Rupture de stock',
-                                style: TextStyle(fontSize: 13, color: Colors.red),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.red,
+                                ),
                               ),
                           ],
                         ),
@@ -214,14 +237,21 @@ class _DetailsBodyState extends State<DetailsBody> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: (isAdding || widget.product.stock == 0) ? null : _addToCart,
-                  child: isAdding
-                      ? const SizedBox(
-                          height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text(
-                          'Ajouter au panier',
-                          style: TextStyle(fontSize: 18),
-                        ),
+                  onPressed:
+                      (isAdding || widget.product.stock == 0)
+                          ? null
+                          : _addToCart,
+                  child:
+                      isAdding
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text(
+                            'Add to cart',
+                            style: TextStyle(fontSize: 18),
+                          ),
                 ),
               ),
             ),

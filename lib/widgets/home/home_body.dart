@@ -46,57 +46,70 @@ class _HomeBodyState extends State<HomeBody> {
                   ),
                 ),
                 RefreshIndicator(
-                  onRefresh: () => context.read<ProductsProvider>().fetchProducts(),
-                  child: Builder(builder: (context) {
-                    if (productsProvider.isLoading && productsProvider.products.isEmpty) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                  onRefresh:
+                      () => context.read<ProductsProvider>().fetchProducts(),
+                  child: Builder(
+                    builder: (context) {
+                      if (productsProvider.isLoading &&
+                          productsProvider.products.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                    if (productsProvider.error != null && productsProvider.products.isEmpty) {
-                      return ListView(
-                        children: [
-                          const SizedBox(height: 120),
-                          Icon(Icons.wifi_off, size: 48, color: kTextLightColor),
-                          const SizedBox(height: 12),
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24),
-                              child: Text(
-                                "Impossible de charger les produits.\nVérifie que le serveur backend est démarré.",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: kTextLightColor),
+                      if (productsProvider.error != null &&
+                          productsProvider.products.isEmpty) {
+                        return ListView(
+                          children: [
+                            const SizedBox(height: 120),
+                            Icon(
+                              Icons.wifi_off,
+                              size: 48,
+                              color: kTextLightColor,
+                            ),
+                            const SizedBox(height: 12),
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                ),
+                                child: Text(
+                                  "Unable to load products.\nPlease check that the backend server is running.",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: kTextLightColor),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    }
-
-                    final products = productsProvider.products;
-
-                    // index 0 = section "Recommandé pour vous" (invisible si rien à
-                    // afficher), les index suivants = la liste normale de produits.
-                    return ListView.builder(
-                      itemCount: products.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == 0) {
-                          return const RecommendationsSection();
-                        }
-                        final product = products[index - 1];
-                        return ProductCard(
-                          itemindex: index - 1,
-                          product: product,
-                          press: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => DetailsScreen(product: product),
-                              ),
-                            );
-                          },
+                          ],
                         );
-                      },
-                    );
-                  }),
+                      }
+
+                      final products = productsProvider.products;
+
+                      // index 0 = section "Recommandé pour vous" (invisible si rien à
+                      // afficher), les index suivants = la liste normale de produits.
+                      return ListView.builder(
+                        itemCount: products.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return const RecommendationsSection();
+                          }
+                          final product = products[index - 1];
+                          return ProductCard(
+                            itemindex: index - 1,
+                            product: product,
+                            press: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          DetailsScreen(product: product),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

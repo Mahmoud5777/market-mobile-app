@@ -24,21 +24,21 @@ class _RegisterPageState extends State<RegisterPage> {
     if (fullName.isEmpty || email.isEmpty || password.isEmpty) {
       setState(() {
         isError = true;
-        message = "❌ Veuillez remplir tous les champs.";
+        message = "❌ Please fill in all fields.";
       });
       return;
     }
     if (!email.contains('@')) {
       setState(() {
         isError = true;
-        message = "❌ Adresse email invalide.";
+        message = "❌ Invalid email address.";
       });
       return;
     }
     if (password.length < 6) {
       setState(() {
         isError = true;
-        message = "❌ Le mot de passe doit contenir au moins 6 caractères.";
+        message = "❌ Password must contain at least 6 characters.";
       });
       return;
     }
@@ -49,7 +49,11 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      await context.read<AuthProvider>().register(fullName: fullName, email: email, password: password);
+      await context.read<AuthProvider>().register(
+        fullName: fullName,
+        email: email,
+        password: password,
+      );
       if (!mounted) return;
       Navigator.pop(context, true);
     } on ApiException catch (e) {
@@ -60,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       setState(() {
         isError = true;
-        message = "❌ Impossible de contacter le serveur";
+        message = "❌ Unable to contact the server";
       });
     } finally {
       if (mounted) setState(() => isLoading = false);
@@ -97,7 +101,7 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Créer un compte 📝",
+                  "Create an account 📝",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -108,7 +112,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextField(
                   controller: fullNameController,
                   decoration: InputDecoration(
-                    labelText: "Nom complet",
+                    labelText: "Full name",
                     prefixIcon: Icon(Icons.person),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -132,7 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: "Mot de passe",
+                    labelText: "Password",
                     prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -141,7 +145,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 SizedBox(height: 20),
                 if (message.isNotEmpty)
-                  Text(message, style: TextStyle(color: isError ? Colors.red : Colors.green)),
+                  Text(
+                    message,
+                    style: TextStyle(
+                      color: isError ? Colors.red : Colors.green,
+                    ),
+                  ),
                 SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -154,16 +163,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : Text(
-                            "Créer le compte",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                    child:
+                        isLoading
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : Text(
+                              "Create account",
+                              style: TextStyle(fontSize: 16),
+                            ),
                   ),
                 ),
               ],

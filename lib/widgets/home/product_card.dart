@@ -88,7 +88,9 @@ class ProductCard extends StatelessWidget {
                           color: kSecondaryColor,
                           borderRadius: BorderRadius.circular(22),
                         ),
-                        child: Text('prix : \$${product.price.toStringAsFixed(2)}'),
+                        child: Text(
+                          'Price: \$${product.price.toStringAsFixed(2)}',
+                        ),
                       ),
                     ),
                   ],

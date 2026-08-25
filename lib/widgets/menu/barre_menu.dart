@@ -45,7 +45,9 @@ class LeftSideMenu extends StatelessWidget {
                       CircleAvatar(
                         backgroundColor: Colors.blueAccent,
                         child: Text(
-                          auth.user!.fullName.isNotEmpty ? auth.user!.fullName[0].toUpperCase() : '?',
+                          auth.user!.fullName.isNotEmpty
+                              ? auth.user!.fullName[0].toUpperCase()
+                              : '?',
                           style: const TextStyle(color: Colors.white),
                         ),
                       ),
@@ -54,13 +56,29 @@ class LeftSideMenu extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(auth.user!.fullName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            Text(auth.user!.email, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            Text(
+                              auth.user!.fullName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              auth.user!.email,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
                             if (auth.isAdmin)
                               const Padding(
                                 padding: EdgeInsets.only(top: 2),
-                                child: Text('Administrateur',
-                                    style: TextStyle(fontSize: 11, color: Colors.deepOrange)),
+                                child: Text(
+                                  'Administrator',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.deepOrange,
+                                  ),
+                                ),
                               ),
                           ],
                         ),
@@ -71,30 +89,35 @@ class LeftSideMenu extends StatelessWidget {
               else
                 const Padding(
                   padding: EdgeInsets.fromLTRB(16, 20, 16, 10),
-                  child: Text('Non connecté', style: TextStyle(color: Colors.grey)),
+                  child: Text(
+                    'Not signed in',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               const Divider(height: 1),
               ListTile(
                 leading: const Icon(Icons.home),
-                title: const Text('Accueil'),
+                title: const Text('Home'),
                 onTap: () => Navigator.pop(context),
               ),
               if (auth.isAdmin)
                 ListTile(
                   leading: const Icon(Icons.admin_panel_settings),
-                  title: const Text('Gestion des produits'),
+                  title: const Text('Product management'),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const AdminProductsScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const AdminProductsScreen(),
+                      ),
                     );
                   },
                 ),
               if (auth.isAuthenticated) ...[
                 ListTile(
                   leading: const Icon(Icons.person),
-                  title: const Text('Mon compte'),
+                  title: const Text('My account'),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -105,7 +128,7 @@ class LeftSideMenu extends StatelessWidget {
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout),
-                  title: const Text('Déconnexion'),
+                  title: const Text('Sign out'),
                   onTap: () async {
                     await context.read<AuthProvider>().logout();
                     if (!context.mounted) return;
@@ -115,7 +138,7 @@ class LeftSideMenu extends StatelessWidget {
               ] else
                 ListTile(
                   leading: const Icon(Icons.login),
-                  title: const Text('Se connecter'),
+                  title: const Text('Sign in'),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(

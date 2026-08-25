@@ -22,14 +22,17 @@ class _PaymentPageState extends State<PaymentPage> {
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: const Text('Paiement'),
+        title: const Text('Payment'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Récapitulatif', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Summary',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             Card(
               child: Padding(
@@ -37,23 +40,29 @@ class _PaymentPageState extends State<PaymentPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total à payer'),
+                    const Text('Total to pay'),
                     Text(
                       '\$${cart.total.toStringAsFixed(2)}',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: kSecondaryColor),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: kSecondaryColor,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Choisis un moyen de paiement (simulé)',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text(
+              'Choose a payment method (simulated)',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 12),
             RadioListTile<String>(
               value: 'card',
               groupValue: selectedMethod,
-              title: const Text('Carte bancaire'),
+              title: const Text('Bank card'),
               secondary: const Icon(Icons.credit_card),
               onChanged: (value) => setState(() => selectedMethod = value!),
             ),
@@ -72,19 +81,28 @@ class _PaymentPageState extends State<PaymentPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                  onPressed: cart.items.isEmpty
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CardPaymentFormPage(paymentMethod: selectedMethod),
-                            ),
-                          );
-                        },
-                  child: const Text('Continuer', style: TextStyle(fontSize: 18)),
+                  onPressed:
+                      cart.items.isEmpty
+                          ? null
+                          : () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => CardPaymentFormPage(
+                                      paymentMethod: selectedMethod,
+                                    ),
+                              ),
+                            );
+                          },
+                  child: const Text(
+                    'Continuer',
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
               ),
             ),

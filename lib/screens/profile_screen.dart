@@ -47,30 +47,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       await context.read<AuthProvider>().updateProfile(
-            fullName: fullNameController.text.trim(),
-            email: emailController.text.trim(),
-            currentPassword: currentPasswordController.text,
-            newPassword: showPasswordFields && newPasswordController.text.isNotEmpty
+        fullName: fullNameController.text.trim(),
+        email: emailController.text.trim(),
+        currentPassword: currentPasswordController.text,
+        newPassword:
+            showPasswordFields && newPasswordController.text.isNotEmpty
                 ? newPasswordController.text
                 : null,
-          );
+      );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Compte mis à jour ✅')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Account updated ✅')));
       currentPasswordController.clear();
       newPasswordController.clear();
       confirmPasswordController.clear();
       setState(() => showPasswordFields = false);
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Une erreur est survenue')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('An error occurred')));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -82,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: const Text('Mon compte'),
+        title: const Text('My account'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
@@ -92,24 +95,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               TextFormField(
                 controller: fullNameController,
-                decoration: const InputDecoration(labelText: 'Nom complet', border: OutlineInputBorder()),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Full name',
+                  border: OutlineInputBorder(),
+                ),
+                validator:
+                    (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? 'Required field'
+                            : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Champ requis';
-                  if (!v.contains('@')) return 'Email invalide';
+                  if (v == null || v.trim().isEmpty) return 'Required field';
+                  if (!v.contains('@')) return 'Invalid email';
                   return null;
                 },
               ),
               const SizedBox(height: 20),
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Changer le mot de passe'),
+                title: const Text('Change password'),
                 value: showPasswordFields,
                 onChanged: (v) => setState(() => showPasswordFields = v),
               ),
@@ -118,12 +131,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 TextFormField(
                   controller: newPasswordController,
                   obscureText: true,
-                  decoration:
-                      const InputDecoration(labelText: 'Nouveau mot de passe', border: OutlineInputBorder()),
+                  decoration: const InputDecoration(
+                    labelText: 'New password',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (v) {
                     if (!showPasswordFields) return null;
-                    if (v == null || v.isEmpty) return 'Champ requis';
-                    if (v.length < 6) return 'Au moins 6 caractères';
+                    if (v == null || v.isEmpty) return 'Required field';
+                    if (v.length < 6) return 'At least 6 characters';
                     return null;
                   },
                 ),
@@ -132,10 +147,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   controller: confirmPasswordController,
                   obscureText: true,
                   decoration: const InputDecoration(
-                      labelText: 'Confirmer le nouveau mot de passe', border: OutlineInputBorder()),
+                    labelText: 'Confirm new password',
+                    border: OutlineInputBorder(),
+                  ),
                   validator: (v) {
                     if (!showPasswordFields) return null;
-                    if (v != newPasswordController.text) return 'Les mots de passe ne correspondent pas';
+                    if (v != newPasswordController.text)
+                      return 'Passwords do not match';
                     return null;
                   },
                 ),
@@ -144,16 +162,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const Divider(),
               const SizedBox(height: 8),
               Text(
-                'Confirme avec ton mot de passe actuel pour enregistrer les modifications',
+                'Confirm with your current password to save changes',
                 style: TextStyle(color: kTextLightColor, fontSize: 13),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: currentPasswordController,
                 obscureText: true,
-                decoration:
-                    const InputDecoration(labelText: 'Mot de passe actuel', border: OutlineInputBorder()),
-                validator: (v) => (v == null || v.isEmpty) ? 'Champ requis' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Current password',
+                  border: OutlineInputBorder(),
+                ),
+                validator:
+                    (v) => (v == null || v.isEmpty) ? 'Required field' : null,
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -162,12 +183,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: isSaving ? null : _save,
-                  child: isSaving
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Enregistrer'),
+                  child:
+                      isSaving
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text('Save'),
                 ),
               ),
             ],

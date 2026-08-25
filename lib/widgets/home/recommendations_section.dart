@@ -41,7 +41,9 @@ class _RecommendationsSectionState extends State<RecommendationsSection> {
   Future<void> _load(String token) async {
     setState(() => _isLoading = true);
     try {
-      final recs = await RecommendationService.fetchMyRecommendations(token: token);
+      final recs = await RecommendationService.fetchMyRecommendations(
+        token: token,
+      );
       if (!mounted) return;
       setState(() {
         _recommendations = recs;
@@ -72,8 +74,12 @@ class _RecommendationsSectionState extends State<RecommendationsSection> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
             child: Text(
-              'Recommandé pour vous',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kTextColor),
+              'Recommended for you',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: kTextColor,
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -89,7 +95,9 @@ class _RecommendationsSectionState extends State<RecommendationsSection> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => DetailsScreen(product: rec.product)),
+                      MaterialPageRoute(
+                        builder: (_) => DetailsScreen(product: rec.product),
+                      ),
                     );
                   },
                   child: Container(
@@ -98,13 +106,21 @@ class _RecommendationsSectionState extends State<RecommendationsSection> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))],
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
                           child: SmartImage(
                             path: rec.product.image,
                             height: 100,
@@ -121,12 +137,18 @@ class _RecommendationsSectionState extends State<RecommendationsSection> {
                                 rec.product.title,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 '\$${rec.product.price.toStringAsFixed(2)}',
-                                style: const TextStyle(color: kSecondaryColor, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                  color: kSecondaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),

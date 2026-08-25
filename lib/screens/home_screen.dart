@@ -20,7 +20,7 @@ class Homescreen extends StatelessWidget {
       backgroundColor: kPrimaryColor,
       elevation: 0,
       title: const Text(
-        'Découvrez nos nouveautés high-tech',
+        'Discover our latest tech products',
         style: TextStyle(
           fontFamily: 'Roboto',
           fontSize: 18,
@@ -54,7 +54,7 @@ class Homescreen extends StatelessWidget {
       actions: [
         if (auth.isAdmin)
           IconButton(
-            tooltip: 'Gérer les produits',
+            tooltip: 'Manage products',
             icon: const Icon(Icons.admin_panel_settings),
             onPressed: () {
               Navigator.push(
@@ -64,7 +64,7 @@ class Homescreen extends StatelessWidget {
             },
           ),
         IconButton(
-          tooltip: 'Panier',
+          tooltip: 'Cart',
           icon: Badge(
             label: Text('${cart.itemCount}'),
             isLabelVisible: cart.itemCount > 0,

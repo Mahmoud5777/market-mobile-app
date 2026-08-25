@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     final password = passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      setState(() => errorText = "Veuillez remplir tous les champs");
+      setState(() => errorText = "Please fill in all fields");
       return;
     }
 
@@ -30,13 +30,16 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      await context.read<AuthProvider>().login(email: email, password: password);
+      await context.read<AuthProvider>().login(
+        email: email,
+        password: password,
+      );
       if (!mounted) return;
       Navigator.pop(context, true);
     } on ApiException catch (e) {
       setState(() => errorText = e.message);
     } catch (e) {
-      setState(() => errorText = "Impossible de contacter le serveur");
+      setState(() => errorText = "Unable to contact the server");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -72,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Bienvenue 👋",
+                  "Welcome 👋",
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -96,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                   controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    labelText: "Mot de passe",
+                    labelText: "Password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -105,10 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(height: 20),
                 if (errorText.isNotEmpty)
-                  Text(
-                    errorText,
-                    style: TextStyle(color: Colors.red),
-                  ),
+                  Text(errorText, style: TextStyle(color: Colors.red)),
                 SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -121,13 +121,20 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       backgroundColor: Colors.blueAccent,
                     ),
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                          )
-                        : Text("Se connecter", style: TextStyle(fontSize: 16)),
+                    child:
+                        isLoading
+                            ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                            : Text(
+                              "Se connecter",
+                              style: TextStyle(fontSize: 16),
+                            ),
                   ),
                 ),
                 SizedBox(height: 15),
@@ -142,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                   child: Text(
-                    "Pas encore de compte ? Créer un compte",
+                    "Don't have an account yet? Create an account",
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),

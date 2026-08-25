@@ -46,7 +46,8 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
     // would hand the raw card details to a payment gateway SDK (Stripe, etc.)
     // instead, and the backend would only ever see a payment token.
     final digits = cardNumberController.text.replaceAll(RegExp(r'\D'), '');
-    final last4 = digits.length >= 4 ? digits.substring(digits.length - 4) : digits;
+    final last4 =
+        digits.length >= 4 ? digits.substring(digits.length - 4) : digits;
 
     try {
       await OrderService.checkout(
@@ -61,29 +62,34 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
       await showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          title: const Text('Commande confirmée ✅'),
-          content: const Text('Ton paiement (simulé) a été accepté et ta commande est enregistrée.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const Homescreen()),
-                  (route) => false,
-                );
-              },
-              child: const Text('Retour à l\'accueil'),
+        builder:
+            (_) => AlertDialog(
+              title: const Text('Order confirmed ✅'),
+              content: const Text(
+                'Your payment (simulated) was accepted and your order has been recorded.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (_) => const Homescreen()),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Back to home'),
+                ),
+              ],
             ),
-          ],
-        ),
       );
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Le paiement a échoué, réessaie.')),
+        const SnackBar(content: Text('Payment failed, please try again.')),
       );
     } finally {
       if (mounted) setState(() => isProcessing = false);
@@ -96,7 +102,11 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: Text(widget.paymentMethod == 'mastercard' ? 'Paiement Mastercard' : 'Paiement par carte'),
+        title: Text(
+          widget.paymentMethod == 'mastercard'
+              ? 'Mastercard payment'
+              : 'Card payment',
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
@@ -106,18 +116,28 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
             children: [
               TextFormField(
                 controller: cardHolderController,
-                decoration: const InputDecoration(labelText: 'Titulaire de la carte', border: OutlineInputBorder()),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Cardholder name',
+                  border: OutlineInputBorder(),
+                ),
+                validator:
+                    (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? 'Required field'
+                            : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: cardNumberController,
                 keyboardType: TextInputType.number,
                 maxLength: 19,
-                decoration: const InputDecoration(labelText: 'Numéro de carte', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Card number',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) {
                   final digits = (v ?? '').replaceAll(RegExp(r'\D'), '');
-                  if (digits.length < 12) return 'Numéro de carte invalide';
+                  if (digits.length < 12) return 'Invalid card number';
                   return null;
                 },
               ),
@@ -126,8 +146,15 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
                   Expanded(
                     child: TextFormField(
                       controller: expiryController,
-                      decoration: const InputDecoration(labelText: 'MM/AA', border: OutlineInputBorder()),
-                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Requis' : null,
+                      decoration: const InputDecoration(
+                        labelText: 'MM/AA',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator:
+                          (v) =>
+                              (v == null || v.trim().isEmpty)
+                                  ? 'Required'
+                                  : null,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -137,15 +164,19 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
                       keyboardType: TextInputType.number,
                       maxLength: 4,
                       obscureText: true,
-                      decoration: const InputDecoration(labelText: 'CVV', border: OutlineInputBorder()),
-                      validator: (v) => (v == null || v.length < 3) ? 'Invalide' : null,
+                      decoration: const InputDecoration(
+                        labelText: 'CVV',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator:
+                          (v) => (v == null || v.length < 3) ? 'Invalid' : null,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                'Paiement simulé - aucune vraie transaction ne sera effectuée.',
+                'Simulated payment - no real transaction will be processed.',
                 style: TextStyle(color: kTextLightColor, fontSize: 12),
               ),
               const SizedBox(height: 24),
@@ -155,12 +186,22 @@ class _CardPaymentFormPageState extends State<CardPaymentFormPage> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.amber,
                     padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: isProcessing ? null : _submit,
-                  child: isProcessing
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : const Text('Payer maintenant', style: TextStyle(fontSize: 18)),
+                  child:
+                      isProcessing
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text(
+                            'Pay now',
+                            style: TextStyle(fontSize: 18),
+                          ),
                 ),
               ),
             ],

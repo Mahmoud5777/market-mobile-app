@@ -27,17 +27,24 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
   Future<void> _confirmDelete(Product product) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Supprimer ce produit ?'),
-        content: Text('« ${product.title} » sera définitivement supprimé.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Supprimer', style: TextStyle(color: Colors.red)),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Delete this product?'),
+            content: Text('"${product.title}" will be permanently deleted.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
 
     if (confirmed != true) return;
@@ -46,12 +53,19 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     if (token == null) return;
 
     try {
-      await context.read<ProductsProvider>().deleteProduct(product.id, token: token);
+      await context.read<ProductsProvider>().deleteProduct(
+        product.id,
+        token: token,
+      );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Produit supprimé')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Product deleted')));
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
 
@@ -63,12 +77,12 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: const Text('Gestion des produits'),
+        title: const Text('Product management'),
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: kPrimaryColor,
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
+        label: const Text('Add'),
         onPressed: () {
           Navigator.push(
             context,
@@ -76,51 +90,64 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
           );
         },
       ),
-      body: productsProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: () => context.read<ProductsProvider>().fetchProducts(),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(kDefaultPadding),
-                itemCount: productsProvider.products.length,
-                itemBuilder: (context, index) {
-                  final product = productsProvider.products[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    child: ListTile(
-                      leading: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: SmartImage(path: product.image, height: 48, width: 48, fit: BoxFit.cover),
-                      ),
-                      title: Text(product.title),
-                      subtitle: Text(
-                        '\$${product.price.toStringAsFixed(2)} · stock: ${product.stock}',
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blueAccent),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => AdminProductFormScreen(existingProduct: product),
-                                ),
-                              );
-                            },
+      body:
+          productsProvider.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                onRefresh:
+                    () => context.read<ProductsProvider>().fetchProducts(),
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(kDefaultPadding),
+                  itemCount: productsProvider.products.length,
+                  itemBuilder: (context, index) {
+                    final product = productsProvider.products[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: ListTile(
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: SmartImage(
+                            path: product.image,
+                            height: 48,
+                            width: 48,
+                            fit: BoxFit.cover,
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => _confirmDelete(product),
-                          ),
-                        ],
+                        ),
+                        title: Text(product.title),
+                        subtitle: Text(
+                          '\$${product.price.toStringAsFixed(2)} · stock: ${product.stock}',
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.blueAccent,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (_) => AdminProductFormScreen(
+                                          existingProduct: product,
+                                        ),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _confirmDelete(product),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
     );
   }
 }

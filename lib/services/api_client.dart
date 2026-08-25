@@ -19,16 +19,20 @@ class ApiClient {
   static Uri _uri(String path) => Uri.parse('${ApiConfig.baseUrl}$path');
 
   static Map<String, String> _headers(String? token) => {
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
 
   static Future<dynamic> get(String path, {String? token}) async {
     final response = await http.get(_uri(path), headers: _headers(token));
     return _handle(response);
   }
 
-  static Future<dynamic> post(String path, {Map<String, dynamic>? body, String? token}) async {
+  static Future<dynamic> post(
+    String path, {
+    Map<String, dynamic>? body,
+    String? token,
+  }) async {
     final response = await http.post(
       _uri(path),
       headers: _headers(token),
@@ -37,7 +41,11 @@ class ApiClient {
     return _handle(response);
   }
 
-  static Future<dynamic> put(String path, {Map<String, dynamic>? body, String? token}) async {
+  static Future<dynamic> put(
+    String path, {
+    Map<String, dynamic>? body,
+    String? token,
+  }) async {
     final response = await http.put(
       _uri(path),
       headers: _headers(token),
@@ -62,14 +70,16 @@ class ApiClient {
   }) async {
     final request = http.MultipartRequest('POST', _uri(path));
     if (token != null) request.headers['Authorization'] = 'Bearer $token';
-    request.files.add(http.MultipartFile.fromBytes(
-      'file',
-      bytes,
-      filename: filename,
-      // Sans ceci, le package http envoie "application/octet-stream" par défaut,
-      // que le backend rejette (il n'accepte que jpeg/png/webp).
-      contentType: _mediaTypeForFilename(filename),
-    ));
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        bytes,
+        filename: filename,
+        // Sans ceci, le package http envoie "application/octet-stream" par défaut,
+        // que le backend rejette (il n'accepte que jpeg/png/webp).
+        contentType: _mediaTypeForFilename(filename),
+      ),
+    );
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
@@ -80,7 +90,10 @@ class ApiClient {
     final lower = filename.toLowerCase();
     if (lower.endsWith('.png')) return MediaType('image', 'png');
     if (lower.endsWith('.webp')) return MediaType('image', 'webp');
-    return MediaType('image', 'jpeg'); // couvre .jpg/.jpeg et tout le reste par défaut
+    return MediaType(
+      'image',
+      'jpeg',
+    ); // couvre .jpg/.jpeg et tout le reste par défaut
   }
 
   static dynamic _handle(http.Response response) {
@@ -88,7 +101,7 @@ class ApiClient {
 
     if (status == 204 || response.body.isEmpty) {
       if (status >= 200 && status < 300) return null;
-      throw ApiException(status, 'Erreur serveur ($status)');
+      throw ApiException(status, 'Server error ($status)');
     }
 
     dynamic decoded;
@@ -102,9 +115,10 @@ class ApiClient {
       return decoded;
     }
 
-    final message = (decoded is Map && decoded['message'] != null)
-        ? decoded['message'] as String
-        : 'Erreur serveur ($status)';
+    final message =
+        (decoded is Map && decoded['message'] != null)
+            ? decoded['message'] as String
+            : 'Server error ($status)';
     throw ApiException(status, message);
   }
 }

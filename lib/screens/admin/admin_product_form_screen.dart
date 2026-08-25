@@ -40,9 +40,15 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     titleController = TextEditingController(text: p?.title ?? '');
     subTitleController = TextEditingController(text: p?.subTitle ?? '');
     descriptionController = TextEditingController(text: p?.description ?? '');
-    priceController = TextEditingController(text: p != null ? p.price.toString() : '');
-    imageUrlController = TextEditingController(text: p != null && p.isNetworkImage ? p.image : '');
-    stockController = TextEditingController(text: p != null ? p.stock.toString() : '');
+    priceController = TextEditingController(
+      text: p != null ? p.price.toString() : '',
+    );
+    imageUrlController = TextEditingController(
+      text: p != null && p.isNetworkImage ? p.image : '',
+    );
+    stockController = TextEditingController(
+      text: p != null ? p.stock.toString() : '',
+    );
   }
 
   @override
@@ -57,7 +63,10 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
   }
 
   Future<void> _pickImage() async {
-    final file = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 1600);
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1600,
+    );
     if (file == null) return;
     final bytes = await file.readAsBytes();
     setState(() {
@@ -87,27 +96,40 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     try {
       final productsProvider = context.read<ProductsProvider>();
 
-      final savedProduct = isEditing
-          ? await productsProvider.updateProduct(widget.existingProduct!.id, product, token: token)
-          : await productsProvider.createProduct(product, token: token);
+      final savedProduct =
+          isEditing
+              ? await productsProvider.updateProduct(
+                widget.existingProduct!.id,
+                product,
+                token: token,
+              )
+              : await productsProvider.createProduct(product, token: token);
 
       if (_pickedImage != null) {
-        await productsProvider.uploadProductImage(savedProduct.id, _pickedImage!, token: token);
+        await productsProvider.uploadProductImage(
+          savedProduct.id,
+          _pickedImage!,
+          token: token,
+        );
       }
 
       if (!mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(isEditing ? 'Produit mis à jour' : 'Produit ajouté')),
+        SnackBar(
+          content: Text(isEditing ? 'Product updated' : 'Product added'),
+        ),
       );
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Une erreur est survenue')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('An error occurred')));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -117,7 +139,12 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
     if (_pickedImageBytes != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.memory(_pickedImageBytes!, height: 160, width: double.infinity, fit: BoxFit.cover),
+        child: Image.memory(
+          _pickedImageBytes!,
+          height: 160,
+          width: double.infinity,
+          fit: BoxFit.cover,
+        ),
       );
     }
     if (imageUrlController.text.trim().isNotEmpty) {
@@ -149,7 +176,7 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
       backgroundColor: kBackgroundColor,
       appBar: AppBar(
         backgroundColor: kPrimaryColor,
-        title: Text(isEditing ? 'Modifier le produit' : 'Ajouter un produit'),
+        title: Text(isEditing ? 'Edit product' : 'Add product'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(kDefaultPadding),
@@ -164,7 +191,11 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 child: OutlinedButton.icon(
                   onPressed: _pickImage,
                   icon: const Icon(Icons.photo_library_outlined),
-                  label: Text(_pickedImage != null ? 'Changer la photo' : 'Choisir une photo depuis la galerie'),
+                  label: Text(
+                    _pickedImage != null
+                        ? 'Change photo'
+                        : 'Choose a photo from the gallery',
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -172,36 +203,55 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                 controller: imageUrlController,
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
-                  labelText: 'ou colle une URL d\'image existante',
-                  helperText: 'Ignoré si une photo a été choisie ci-dessus',
+                  labelText: 'or paste an existing image URL',
+                  helperText: 'Ignored if a photo was selected above',
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
               TextFormField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'Titre', border: OutlineInputBorder()),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Champ requis' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+                validator:
+                    (v) =>
+                        (v == null || v.trim().isEmpty)
+                            ? 'Required field'
+                            : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: subTitleController,
-                decoration: const InputDecoration(labelText: 'Sous-titre', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Subtitle',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: descriptionController,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Description', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: priceController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(labelText: 'Prix (\$)', border: OutlineInputBorder()),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Price (\$)',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Champ requis';
-                  if (double.tryParse(v.trim()) == null) return 'Nombre invalide';
+                  if (v == null || v.trim().isEmpty) return 'Required field';
+                  if (double.tryParse(v.trim()) == null)
+                    return 'Invalid number';
                   return null;
                 },
               ),
@@ -209,10 +259,14 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
               TextFormField(
                 controller: stockController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Stock', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                  labelText: 'Stock',
+                  border: OutlineInputBorder(),
+                ),
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) return 'Champ requis';
-                  if (int.tryParse(v.trim()) == null) return 'Nombre entier requis';
+                  if (v == null || v.trim().isEmpty) return 'Required field';
+                  if (int.tryParse(v.trim()) == null)
+                    return 'Whole number required';
                   return null;
                 },
               ),
@@ -223,12 +277,19 @@ class _AdminProductFormScreenState extends State<AdminProductFormScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kPrimaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: isSaving ? null : _save,
-                  child: isSaving
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                      : Text(isEditing ? 'Enregistrer les modifications' : 'Ajouter le produit'),
+                  child:
+                      isSaving
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : Text(isEditing ? 'Save changes' : 'Add product'),
                 ),
               ),
             ],
