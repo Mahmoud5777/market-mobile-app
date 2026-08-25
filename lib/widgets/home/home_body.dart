@@ -4,6 +4,7 @@ import 'package:project/constants.dart';
 import 'package:project/providers/products_provider.dart';
 import 'package:project/screens/details_screen.dart';
 import 'package:project/widgets/home/product_card.dart';
+import 'package:project/widgets/home/recommendations_section.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -73,19 +74,27 @@ class _HomeBodyState extends State<HomeBody> {
 
                     final products = productsProvider.products;
 
+                    // index 0 = section "Recommandé pour vous" (invisible si rien à
+                    // afficher), les index suivants = la liste normale de produits.
                     return ListView.builder(
-                      itemCount: products.length,
-                      itemBuilder: (context, index) => ProductCard(
-                        itemindex: index,
-                        product: products[index],
-                        press: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => DetailsScreen(product: products[index]),
-                            ),
-                          );
-                        },
-                      ),
+                      itemCount: products.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return const RecommendationsSection();
+                        }
+                        final product = products[index - 1];
+                        return ProductCard(
+                          itemindex: index - 1,
+                          product: product,
+                          press: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => DetailsScreen(product: product),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     );
                   }),
                 ),

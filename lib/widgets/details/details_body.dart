@@ -6,6 +6,7 @@ import 'package:project/providers/auth_provider.dart';
 import 'package:project/providers/cart_provider.dart';
 import 'package:project/screens/cart_screen.dart';
 import 'package:project/services/api_client.dart';
+import 'package:project/services/product_service.dart';
 import 'package:project/widgets/common/auth_guard.dart';
 import 'package:project/widgets/details/color_dot.dart';
 import 'package:project/widgets/details/product_image.dart';
@@ -22,7 +23,19 @@ class _DetailsBodyState extends State<DetailsBody> {
   int quantity = 1;
   bool isAdding = false;
 
+  @override
+  void initState() {
+    super.initState();
+    // L'écran a déjà les données du produit (passées depuis la liste), donc pas
+    // besoin d'attendre ce fetch pour afficher quoi que ce soit. On l'appelle
+    // uniquement pour que le backend enregistre la consultation (événement Kafka
+    // product-views) - erreurs ignorées volontairement, ce n'est pas critique.
+    ProductService.fetchById(widget.product.id).catchError((_) => widget.product);
+  }
+
   Future<void> _addToCart() async {
+    // Comme sur une vraie app marchande : on peut parcourir librement, mais
+    // il faut être connecté pour ajouter un produit au panier.
     final loggedIn = await ensureLoggedIn(context);
     if (!loggedIn || !mounted) return;
 
@@ -99,6 +112,7 @@ class _DetailsBodyState extends State<DetailsBody> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Sélecteur de quantité
                       Column(
                         children: [
                           IconButton(
@@ -128,6 +142,7 @@ class _DetailsBodyState extends State<DetailsBody> {
                         ],
                       ),
                       const SizedBox(width: 20),
+                      // Titre et prix
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
